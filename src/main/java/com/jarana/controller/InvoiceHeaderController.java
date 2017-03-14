@@ -1,4 +1,8 @@
 package com.jarana.controller;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.jarana.entities.InvoiceHeader;
 import com.jarana.service.InvoiceHeaderService;
 
@@ -19,6 +25,10 @@ public class InvoiceHeaderController {
 
 	@Autowired
 	private InvoiceHeaderService invoiceheaderService;
+	
+	@Autowired
+	//TODO test only
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(method = RequestMethod.GET)
 	@ResponseBody
@@ -36,6 +46,34 @@ public class InvoiceHeaderController {
 	@ResponseBody
 	public InvoiceHeader findDet(@PathVariable("ihInvNb") Long ihInvNb) {
 		return invoiceheaderService.findOneDet(ihInvNb);
+	}
+	
+	@RequestMapping(value = "/findByCust/{cuLastNm}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<InvoiceHeader> findByCustomerName(@PathVariable("cuLastNm") String name) {
+		
+		return invoiceheaderService.findByCustomerName(name);
+	}
+
+	@RequestMapping(value = "/findByCust/{cuLastNm}/{startDate}/{endDate}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<InvoiceHeader> findByCustomerNameByDates(@PathVariable("cuLastNm") String name, @PathVariable("startDate") Date startDate, @PathVariable("endDate") Date endDate) {
+		
+		return invoiceheaderService.findByCustomerNameByDates(name, startDate, endDate);
+	}
+	
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@ResponseBody
+	public Date test() {
+		String dateStr = "20161101";
+		Date date = null;
+		try {
+			date = objectMapper.readValue(dateStr, Date.class);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return date;
 	}
 	
 	//@RequestMapping(value = "/WISHED_FIELD_NAME/{FIELD}", method = RequestMethod.GET)

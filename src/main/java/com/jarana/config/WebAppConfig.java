@@ -1,5 +1,7 @@
 package com.jarana.config;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,25 +22,21 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
-import org.springframework.http.converter.feed.RssChannelHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
-import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import com.jarana.serializer.DateDeserializer;
 
 @Configuration
 @EnableTransactionManagement
@@ -55,6 +53,8 @@ public class WebAppConfig extends WebMvcConfigurationSupport {
 	private static final String PROPERTY_NAME_HIBERNATE_DIALECT = "hibernate.dialect";
 	private static final String PROPERTY_NAME_HIBERNATE_SHOW_SQL = "hibernate.show_sql";
 	private static final String PROPERTY_NAME_ENTITYMANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
+	
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
 	@Resource
 	private Environment env;
@@ -139,6 +139,12 @@ public class WebAppConfig extends WebMvcConfigurationSupport {
 	public ObjectMapper objectMapper(){
 		final ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.registerModule(new Hibernate4Module());
+		objectMapper.setDateFormat(dateFormat);
+		
+		SimpleModule module = new SimpleModule()
+		        .addDeserializer(Date.class, new DateDeserializer());
+		objectMapper.registerModule(module);
+		
 		return objectMapper;
 	}
 }
