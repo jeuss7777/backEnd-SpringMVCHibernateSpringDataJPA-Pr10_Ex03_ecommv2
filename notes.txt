@@ -2,3 +2,4 @@ JPQL Date Format
 
 HTTP Status 400: The request sent by the client was syntactically incorrect.
 http://stackoverflow.com/questions/15164864/how-to-accept-date-params-in-a-get-request-to-spring-mvc-controller
+(@RequestParam("from") @DateTimeFormat(pattern="yyyy-MM-dd") Date fromDate)
